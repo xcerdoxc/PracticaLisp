@@ -48,12 +48,17 @@
 )
 
 (defun crea-figura (nom patro color)
-    (nil)
-    (putprop 'nom 'color 'colorF)
-    (nil)
-    (putprop 'nom 'cub   'patro)
-    (nil)
-    (afegeixFigura (nom))
+    (putprop nom color 'colorF)
+    (putprop nom patro 'patroFigura)
+    (putprop nom '(
+                    (1 0 0 0)
+                    (0 1 0 0)
+                    (0 0 1 0)
+                    (0 0 0 1)
+                )
+                'transformacions
+    )
+    (afegeixFigura 'nom)
 )
 
 (defun afegeixFigura(f)

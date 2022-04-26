@@ -62,7 +62,7 @@
 )
 
 (defun afegeixFigura(f)
-    (cons (get 'escena 'figura) f)
+    (putprop 'escena (cons 'f (get 'escena 'figures) ) 'figures)
 )
 
 (defun iniciaEscena() 

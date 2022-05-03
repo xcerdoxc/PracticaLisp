@@ -6,6 +6,7 @@
     (inicia-patronsCub)
     (iniciaEscena)
 )
+
 ;Crea les figura del Cub
 (defun inicia-patronsCub()
     (putprop 'cub '(
@@ -70,14 +71,12 @@
 )
 
 
-;pau
 ; elimina de la llista de figures posicio f
 ; sobreescribim el valor de figures a l'escena
 (defun borra-figura (f)
     (putprop 'escena  (delete f (get 'escena 'figures)) 'figures)
 )
 
-;pau
 ; repintam la figura f, amb el color del fons (blanc)
 (defun cls-figura (f)
     (crea-figura (aux (get f 'puntos) (255 255 255)))                   ; cream la figura a base dels punts passats per f
@@ -85,7 +84,6 @@
     (putprop 'escena  (delete aux (get 'escena 'figures)) 'figures)     ; eliminam la figura aux de l'escena
 )
 
-;pau
 ;borra tot el contingut de l'escena (i de la pantalla)
 (defun borra-figures
     (cond ((null l) nil)
@@ -95,16 +93,48 @@
     )
 )
 
-(defun pinta-figura (f) 
+(defun pinta-figura (f)
+    ;cridam a la funcio que pintara les cares recursivament de f (passem llista de cares per parametre i la seva posicio)
+    (eval (cons 'color (get 'f 'color)))
+    (pinta-cares((get 'f 'cares ) (1)))
+)
 
+(defun pintar-cares ('caresL)
+    ;mentres hi hagi cares, cridar a pinta-cares
+    (cond ((null caresL) nil)
+        (pinta-arestes(car 'caresL)) ;passem llista arestes a quina es vol anar de la subllista
+    )
+)
 
+(defun pinta-arestes('arestesL)        
+    (cond ((null arestesL) nil) 
+        ;hem de anar recorrer la lliste de les arestes de la figura, segons el que en diu la llista pasada per parametre
+        ((equal (get 'f 'arestes) cdr('arestesL))          
+            ;si es la posicio correcte. de la llista de arestes, passam la subllista en forma de llista passada per parametre 
+            (pinta-aresta('punts)))
+        )
+        ; no es la subllista que volem, passam a la seguent
+        (pinta-arestes(car 'arestesL))  
+    )    
+)
+
+(defun pinta-punts('puntsL)
+    (cond ((null puntsL) nil) 
+        ;hem de anar recorrer la lliste dels punts de la figura, segons la posicio dels punts   
+        ((equal (get 'f 'arestes) cdr('arestesL))  
+            ;pintam els punts correctes, nomes els dos primers de cada subllista (x y)
+            (move x y) 
+            (draw x y)
+        )    
+        ; no es la subllista que volem, passam a la seguent
+        (pinta-punts(car 'puntL))          
+    )
 )
 
 
 
-(defun pinta-figures 
 
-)
+
 
 
 

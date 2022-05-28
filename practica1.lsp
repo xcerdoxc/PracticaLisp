@@ -10,30 +10,31 @@
 ;Crea les figura del Cub
 (defun inicia-patronsCub()
     (putprop 'cub '(
-                    (0.5 0 0.5)   ;Punto 1 
-                    (-0.5 0 0.5)  ;Punto 2
-                    (0.5 0 -0.5)  ;Punto 3
-                    (-0.5 0 -0.5) ;Punto 4
+                    (0 0 0)   ;Punto 1 
+                    (100 0 0)  ;Punto 2
+                    (100 100 0)  ;Punto 3
+                    (0 100 0) ;Punto 4
                     ; Mateixos valors amb la diferencia que estan alçats
-                    (0.5 1 0.5)   ;Punto 5 
-                    (-0.5 1 0.5)  ;Punto 6
-                    (0.5 1 -0.5)  ;Punto 7
-                    (-0.5 1 -0.5) ;Punto 8
+                    (0 0 100)   ;Punto 5 
+                    (100 0 100)  ;Punto 6
+                    (100 100 100)  ;Punto 7
+                    (0 100 100) ;Punto 8
                   ) 'puntsC  
     )
     (putprop 'cub '(
                         (1 2)
-                        (1 5)
-                        (1 3)
-                        (2 4)
-                        (2 6)
+                        (2 3)
                         (3 4)
-                        (3 7)
-                        (4 8)
+                        (4 1)
                         (5 6)
-                        (5 7)
-                        (6 8)
-                        (7 8)
+                        (6 7)
+
+                        (8 7)
+                        (5 8)
+                        (6 2)
+                        (7 3)
+                        (8 3)
+                        (1 5)
                     ) 'arestesC
     )
     (putprop 'cub '(
@@ -59,11 +60,11 @@
                 )
                 'transformacions
     )
-    (afegeixFigura 'nom)
+    (afegeixFigura nom)
 )
 
 (defun afegeixFigura(f)
-    (putprop 'escena (cons 'f (get 'escena 'figures) ) 'figures)
+    (putprop 'escena (cons f (get 'escena 'figures) ) 'figures)
 )
 
 (defun iniciaEscena() 
@@ -93,33 +94,74 @@
 (defun pinta-figura (f)
     ;cridam a la funcio que pintara les cares recursivament de f (passem llista de cares per parametre i la seva posicio)
     (eval (cons 'color (get f 'colorF))) ;define el color
-    (pinta-cares (get (get 'f 'patroFigura) 'caresC) ((get 'f 'nom) 'figura))
+    (pinta-cares (get (get f 'patroFigura) 'caresC) f)
 )
-;(get 'f 'nom) 'figura)
 
 ;(get (get 'nomCub50 'patroFigura) 'arestesC)
-(defun pinta-cares (caresL nomF)
+(defun pinta-cares (caresL f)
     ;mentres hi hagi cares, cridar a pinta-cares
-    (cond ((null caresL) nil)
-        (t (pinta-aresta (car caresL) nomF)
-        (cons (car caresL) (pinta-cares (cdr caresL) nomF)))
-    )
-)
-                                    
-(defun pinta-aresta (arestesL nomF)  ;(1 2)  ;como accedo a dicha lista a la posicion que quiero 
-    (cond ((null arestesL) nil)
-        (t                                  ;(cdr todoEso)         car(cdr todoEso)
-            ;(move x y)  ;punt 1  retonrP => (-0.5          0 -0.5)             
-            (moveCursor (retornP (car arestesL) (get (get nomF 'patroFigura) 'puntsC)))
-            ;(draw x y)  ;punt 2
-            (draw  (retornP (cadr arestesL) (get (get nomF 'patroFigura) 'puntsC)))            ;car(cdr l) = cadr l
+    (cond ((null (cdr caresL)) (pinta-arestes-marto (car caresL) f))
+        (t  (moveCursor (agafa-n (get (get f 'patroFigura) 'puntsC) (+ 1 (car (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car (car caresL))))))))
+            (pinta-arestes-martoXF (car caresL) f)
+            (pinta-cares (cdr caresL) f)
         )
     )
 )
 
+
+(defun pinta-arestes-no-funciona (grupArestes f)
+    (cond ((null grupArestes) nil)
+        (t  (pinta-arestes-marto (car grupArestes) f) 
+            (pinta-arestes-marto (cadr grupArestes) f)
+            (pinta-arestes-marto (caddr grupArestes) f)
+            (pinta-arestes-marto (cadddr grupArestes) f)
+        )
+    )
+)
+
+(defun pinta-punts-marto (La f)
+    ;(moveCursor (agafa-n (get (get f 'patroFigura) 'puntsC) (+ 1 (car La))));se ha de ejecutar una vex por cada cara, y luego
+    (drawCursor  (agafa-n (get (get f 'patroFigura) 'puntsC) (+ 1 (cadr La))))
+)
+
+
+
+(defun pinta-arestes-martoXF (Lc f)
+    (cond ((null (cdr Lc)) (pinta-punts-marto (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car Lc))) f))
+        (t(pinta-punts-marto (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car Lc))) f) 
+        (pinta-arestes-marto (cdr Lc) f))
+    )
+)
+
+
+
+;tiene un error ;crear un comentario para entenderlo bien
+(defun pinta-arestes-marto (Lc f)
+    (cond ((null (cdr Lc)) (moveCursor (agafa-n (get (get f 'patroFigura) 'puntsC)  (car (agafa-n (get (get f 'patroFigura) 'arestesC (+ 1 (car Lc)))))))(pinta-punts-marto (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car Lc))) f))
+        (t (moveCursor (agafa-n (get (get f 'patroFigura) 'puntsC) (+ 1 (car (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car Lc)))))))(pinta-punts-marto (agafa-n (get (get f 'patroFigura) 'arestesC) (+ 1 (car Lc))) f) 
+        (pinta-arestes-marto (cdr Lc) f))
+    )
+)
+
+
+
+
+(defun pinta-aresta (arestesL f)  ;(1 2)  ;como accedo a dicha lista a la posicion que quiero 
+    (cond ((null arestesL) nil)
+        (t                                  ;(cdr todoEso)         car(cdr todoEso)
+            ;(move x y)  ;punt 1  retonrP => (-0.5          0 -0.5)             
+            (moveCursor (retornP (car arestesL) (get (get f 'patroFigura) 'puntsC)))
+            ;(draw x y)  ;punt 2
+            (drawCursor  (retornP (cadr arestesL) (get (get f 'patroFigura) 'puntsC)))            ;car(cdr l) = cadr l
+        )
+    )
+)
+
+;(pinta-aresta ((get (get 'nom3 'patroFigura) 'arestesC) 'nom3) nom3) 
+
 ;Función que retorna el n-esimo elemento de una lista
 (defun retornP (n puntsL)
-    (cond ((null puntL) nil) 
+    (cond ((null puntsL) nil) 
         ((= n 0) (car puntsL))
         (t (retornP (- n 1) (cdr puntsL)))    
     )
@@ -127,13 +169,14 @@
 
 ;Funciones para pintar una lista de puntos desde el centro de la pantalla
 (defun moveCursor (L) 
-    (move (+ 320 (car L)) (+ 187 (cadr L)))    
+    (move (toInt (+ 320 (car L))) (toInt (+ 187 (cadr L))))    
 )
 
 (defun drawCursor (L) 
-    (draw (+ 320 (car L)) (+ 187 (cadr L)))    
+    (draw (toInt(+ 320 (car L))) (toInt(+ 187 (cadr L))))    
 )
 
+(defun toInt (x) (realpart (round x)))
 
 (defun translacio (dx dy dz) 
     '((1 0 0 0) (0 1 0 0) (0 0 1 0) (dx dy dz 1))

@@ -75,6 +75,7 @@
 ; sobreescribim el valor de figures a l'escena
 (defun borra-figura (f)
     (putprop 'escena  (delete f (get 'escena 'figures)) 'figures)
+    (cls-figura f)
 )
 
 ; repintam la figura f, amb el color del fons (blanc)
@@ -84,58 +85,54 @@
     (putprop 'escena  (delete aux (get 'escena 'figures)) 'figures)     ; eliminam la figura aux de l'escena
 )
 
-;borra tot el contingut de l'escena (i de la pantalla)
-(defun borra-figures
-    (cond ((null l) nil)
-        (t  (borra_figura (car (get 'escena 'figures)))
-            (borra-figures)
-        )
-    )
+(defun borra-figures ()
+    (cls)   ;Borramos pantalla
+    (putprop 'escena nil 'figures) ;-> borra la lista figures de escena
 )
 
 (defun pinta-figura (f)
     ;cridam a la funcio que pintara les cares recursivament de f (passem llista de cares per parametre i la seva posicio)
-    (eval (cons 'color (get 'f 'color)))
-    (pinta-cares((get 'f 'cares ) (1)))
+    (eval (cons 'color (get f 'colorF))) ;define el color
+    (pinta-cares (get (get 'f 'patroFigura) 'caresC) ((get 'f 'nom) 'figura))
 )
+;(get 'f 'nom) 'figura)
 
-(defun pintar-cares ('caresL)
+;(get (get 'nomCub50 'patroFigura) 'arestesC)
+(defun pinta-cares (caresL nomF)
     ;mentres hi hagi cares, cridar a pinta-cares
     (cond ((null caresL) nil)
-        (pinta-arestes(car 'caresL)) ;passem llista arestes a quina es vol anar de la subllista
+        (t (pinta-aresta (car caresL) nomF)
+        (cons (car caresL) (pinta-cares (cdr caresL) nomF)))
     )
 )
-
-(defun pinta-arestes('arestesL)        
-    (cond ((null arestesL) nil) 
-        ;hem de anar recorrer la lliste de les arestes de la figura, segons el que en diu la llista pasada per parametre
-        ((equal (get 'f 'arestes) cdr('arestesL))          
-            ;si es la posicio correcte. de la llista de arestes, passam la subllista en forma de llista passada per parametre 
-            (pinta-aresta('punts)))
+                                    
+(defun pinta-aresta (arestesL nomF)  ;(1 2)  ;como accedo a dicha lista a la posicion que quiero 
+    (cond ((null arestesL) nil)
+        (t                                  ;(cdr todoEso)         car(cdr todoEso)
+            ;(move x y)  ;punt 1  retonrP => (-0.5          0 -0.5)             
+            (moveCursor (retornP (car arestesL) (get (get nomF 'patroFigura) 'puntsC)))
+            ;(draw x y)  ;punt 2
+            (draw  (retornP (cadr arestesL) (get (get nomF 'patroFigura) 'puntsC)))            ;car(cdr l) = cadr l
         )
-        ; no es la subllista que volem, passam a la seguent
-        (pinta-arestes(car 'arestesL))  
-    )    
-)
-
-(defun pinta-punts('puntsL)
-    (cond ((null puntsL) nil) 
-        ;hem de anar recorrer la lliste dels punts de la figura, segons la posicio dels punts   
-        ((equal (get 'f 'arestes) cdr('arestesL))  
-            ;pintam els punts correctes, nomes els dos primers de cada subllista (x y)
-            (move x y) 
-            (draw x y)
-        )    
-        ; no es la subllista que volem, passam a la seguent
-        (pinta-punts(car 'puntL))          
     )
 )
 
+;Función que retorna el n-esimo elemento de una lista
+(defun retornP (n puntsL)
+    (cond ((null puntL) nil) 
+        ((= n 0) (car puntsL))
+        (t (retornP (- n 1) (cdr puntsL)))    
+    )
+)
 
+;Funciones para pintar una lista de puntos desde el centro de la pantalla
+(defun moveCursor (L) 
+    (move (+ 320 (car L)) (+ 187 (cadr L)))    
+)
 
-
-
-
+(defun drawCursor (L) 
+    (draw (+ 320 (car L)) (+ 187 (cadr L)))    
+)
 
 
 (defun translacio (dx dy dz) 
@@ -191,14 +188,55 @@
 ;-------       FUNCIONS AUXILIARS      -------
 ;---------------------------------------------
 
-(defun pescalar (l1 l2)
-    (cond ((null l1) nil)
-        (t (+ (* (car l1) (car l2)) (pescalar (cdr l1) (cdr l2))))
+;transposta de una matriu
+(defun transposta (M) (transposta2 M 0))
+
+(defun transposta2 (M n)
+	(cond ((= n (contafiles M)) nil)
+		(t (cons (fila-n M n) (transposta2 M (+ n 1))))
     )
 )
-        
-(defun transposta (m)
-    (cond ((null (car m)) m)
-        ()
+
+;Devuelve el n-esimo elemento de una lista
+(defun agafa-n (L n)
+    (cond ((= n 0) (car L))
+		(t(agafa-n (cdr L) (- n 1)))
+    )
+)
+		
+;Monta una lista con los n-esimos elementos de cadafila de la matriz
+(defun fila-n (M n)
+    (cond ((null M) nil)
+	    (t(cons (agafa-n (car M) n) (fila-n (cdr M) n)))
+    )
+)
+		
+;Cuenta las filas de una matriz
+(defun contafiles (M)
+	(cond ((null M) 0)
+		(t(+ 1 (contafiles (cdr M))))
+    )
+)
+
+;Multiplicació de matrius
+(defun mult-mat (M1 M2) (mult-mat2 M1 (transposta M2)))
+
+(defun mult-mat2 (M1 M2)
+	(cond ((null M1) nil)
+		(t (cons (mult-fila (car M1) M2) (mult-mat2 (cdr M1) M2)))
+    )
+)
+
+;Realiza las operaciones recursivas para obtener la fila de la matriz resultado
+(defun mult-fila (L M)
+	(cond ((null M) nil)
+		(t (cons (opera-fila L (car M)) (mult-fila L (cdr M))))
+    )
+)
+
+;Opera las filas para obtener el elemento Eij de la matriz resultado
+(defun opera-filas (L1 L2)
+	(cond ((null (cdr L1)) (* (car L1) (car L2)))
+		(t (+ (* (car L1) (car L2)) (opera-filas (cdr L1) (cdr L2))))
     )
 )

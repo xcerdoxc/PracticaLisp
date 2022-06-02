@@ -227,45 +227,57 @@
 
 
 (defun translacio (dx dy dz) 
-    '((1 0 0 0) (0 1 0 0) (0 0 1 0) (dx dy dz 1))
+    (list '(1 0 0 0) 
+        '(0 1 0 0) 
+        '(0 0 1 0) 
+        (list dx dy dz 1)
+    )
 )
 
 (defun escalat (ex ey ez) 
-    '((ex 0 0 0) (0 ey 0 0) (0 0 ez 0) (0 0 0 1))
+    (list (ex 0 0 0) 
+        (list 0 ey 0 0) 
+        (list 0 0 ez 0) 
+        '(0 0 0 1)
+    )
 )
 
 (defun rotax (a) 
-    '((1 0 0 0)
-     (0 (cos a) (- 0 (sin a)) 0) 
-     (0 (sin a) (cos a) 0) 
-     (0 0 0 1))
+    (list '(1 0 0 0)
+        (list 0 (cos a) (- 0 (sin a)) 0) 
+        (list 0 (sin a) (cos a) 0) 
+        '(0 0 0 1)
+    )
 )
 
 (defun rotay (a) 
-    '(((cos a) 0 (- 0 (sin a)) 0) 
-    (0 1 0 0) 
-    ((sin a) 0 (cos a) 0) 
-    (0 0 0 1))
+    (list (list (cos a) 0 (- 0 (sin a)) 0) 
+        '(0 1 0 0) 
+        (list (sin a) 0 (cos a) 0) 
+        '(0 0 0 1)
+    )
 )
 
 (defun rotaz (a) 
-    '(((cos a) (- 0 (sin a)) 0 0) 
-    ((sin a) (cos a) 0 0) 
-    (0 0 1 0) 
-    (0 0 0 1))
+    (list (list (cos a) (- 0 (sin a)) 0 0) 
+        (list (sin a) (cos a) 0 0) 
+        '(0 0 1 0) 
+        '(0 0 0 1)
+    )
 )
 
 (defun trasllada-figura (f x y z) 
-
+    (putprop f (mult-mat (get f 'matriu) (translacio x y z)) 'matriu)
 )
 
 (defun rota-figura (f x y z) 
-
-
+    (putprop f (mult-mat (get f 'matriu) (rotax x)) 'matriu)
+    (putprop f (mult-mat (get f 'matriu) (rotay y)) 'matriu)
+    (putprop f (mult-mat (get f 'matriu) (rotaz z)) 'matriu)
 )
 
 (defun escala-figura (f x y z)
-
+    (putprop f (mult-mat (get f 'matriu) (escalat x y z)) 'matriu)
 )
 
 (defun inicia-figura (f)

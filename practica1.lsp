@@ -23,28 +23,29 @@
                   ) 'punts  
     )
     (putprop 'cub '(
-                        (1 2)
-                        (2 3)
-                        (3 4)
-                        (4 1)
-                        (5 6)
-                        (6 7)
-
-                        (8 7)
-                        (5 8)
-                        (6 2)
-                        (7 3)
-                        (8 3)
+                        (1 2)   ;Aresta 1
+                        (2 6)
                         (1 5)
+                        (5 6)
+
+                        (4 3)   ;Aresta 5
+                        (4 8)
+                        (8 7)
+                        (7 3)
+
+                        (4 1)   ;Aresta 9
+                        (3 2)
+                        (8 5)
+                        (7 6)
                     ) 'arestes
     )
     (putprop 'cub '(
                         (1 2 3 4)
-                        (1 2 6 5)
-                        (1 3 5 7)
-                        (2 4 6 8)
-                        (3 4 7 8)
-                        (5 6 7 8)
+                        (4 5 6 7)
+                        (7 11 12 4)
+                        (6 3 11 9)
+                        (5 1 9 10)
+                        (10 12 8 2)
 
                   ) 'cares
     )
@@ -52,7 +53,7 @@
 
 
 (defun inicia-patronsPrisma()
-    (putprop 'prisma '((0 28 50)   ;Punto 1 
+    (putprop 'prisma '((0 28 100)   ;Punto 1 
                     (25 -14 100)  ;Punto 2
                     (-25 -14 100)  ;Punto 3
                     (0 28 -50) ;Punto 4
@@ -76,11 +77,10 @@
     )
     (putprop 'prisma '(
                         (1 2 3)
-                        (9 8 7)
-                        (3 6 4 9)
-                        (2 5 6 8)
-                        (1 4 5 7)
-
+                        (4 5 6)
+                        (3 6 7 9)
+                        (2 5 7 8)
+                        (1 4 8 9)
                   ) 'cares
     )
 )
@@ -235,7 +235,7 @@
 )
 
 (defun escalat (ex ey ez) 
-    (list (ex 0 0 0) 
+    (list (list ex 0 0 0) 
         (list 0 ey 0 0) 
         (list 0 0 ez 0) 
         '(0 0 0 1)
@@ -353,4 +353,15 @@
 	(cond ((null (cdr L1)) (* (car L1) (car L2)))
 		(t (+ (* (car L1) (car L2)) (opera-filas (cdr L1) (cdr L2))))
     )
+)
+
+;Dibuja un teseracto pocho
+(defun teseracto (color) 
+    (crea-figura 'teseracto1 'cub color)
+    (crea-figura 'teseracto2 'cub color)
+    (rota-figura 'teseracto1 10 10 0)
+    (rota-figura 'teseracto2 10 10 0)
+    (escala-figura 'teseracto2 1.5 1.5 1.5)
+    (pinta-figura 'teseracto1)
+    (pinta-figura 'teseracto2)
 )

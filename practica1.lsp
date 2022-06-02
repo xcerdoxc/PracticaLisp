@@ -281,9 +281,7 @@
 )
 
 (defun inicia-figura (f)
-
-
-
+    (putprop f '((1 0 0 0) (0 1 0 0) (0 0 1 0) (0 0 0 1)) 'matriu)
 )
 
 ;---------------------------------------------
@@ -364,4 +362,15 @@
     (escala-figura 'teseracto2 1.5 1.5 1.5)
     (pinta-figura 'teseracto1)
     (pinta-figura 'teseracto2)
+)
+
+;Dibuja un diamante pocho
+(defun diamante (color) 
+    (crea-figura 'diam1 'octaedre color)
+    (crea-figura 'diam2 'octaedre color)
+    (rota-figura 'diam1 10 10 5)
+    (rota-figura 'diam2 10 10 5)
+    (escala-figura 'diam2 1.5 1.5 1.5)
+    (pinta-figura 'diam1)
+    (pinta-figura 'diam2)
 )

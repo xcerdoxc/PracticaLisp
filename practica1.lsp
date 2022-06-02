@@ -5,6 +5,7 @@
 (defun inicia-patrons()
     (inicia-patronsCub)
     (inicia-patronsOctaedre)
+    (inicia-patronsPrisma)
     (iniciaEscena)
 )
 
@@ -49,6 +50,41 @@
     )
 )
 
+
+(defun inicia-patronsPrisma()
+    (putprop 'prisma '((0 28 50)   ;Punto 1 
+                    (25 -14 100)  ;Punto 2
+                    (-25 -14 100)  ;Punto 3
+                    (0 28 -50) ;Punto 4
+                    ; Mateixos valors amb la diferencia que estan alçats
+                    (25 -14 -50)   ;Punto 5 
+                    (-25 -14 -50)  ;Punto 6
+                  ) 'punts  
+    )
+    (putprop 'prisma '(
+                        (1 2)
+                        (1 3)
+                        (2 3)
+                        (4 5)
+                        (4 6)
+                        (5 6)
+
+                        (3 6)
+                        (1 4)
+                        (2 5)
+                    ) 'arestes
+    )
+    (putprop 'prisma '(
+                        (1 2 3)
+                        (9 8 7)
+                        (3 6 4 9)
+                        (2 5 6 8)
+                        (1 4 5 7)
+
+                  ) 'cares
+    )
+)
+
 ;Crea la figura de l'octaedre
 (defun inicia-patronsOctaedre ()
     (putprop 'octaedre '(
@@ -84,12 +120,11 @@
                         (3 7 8)
                         (4 8 5)
 
-                        (1 9 7)
-                        (2 10 7)
-                        (3 11 7)
-                        (4 12 7)
-
-                  ) 'cares
+                        (1 9 10)
+                        (2 10 11)
+                        (3 11 12)
+                        (4 12 9)
+                    ) 'cares
     )
 )
 
@@ -134,9 +169,6 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; (crea-figura 'n1 'cub '(100 100 100)) 
-
 
 (defun pinta-figura (f)
     ;cridam a la funcio que pintara les cares recursivament de f (passem llista de cares per parametre i la seva posicio)
@@ -161,20 +193,23 @@
     )
 )
 
-(defun pinta-punts (La f)
-   
-    
-    (moveCursor (agafa-n (get (get f 'patroFigura) 'punts) (- (car La) 1)))      
-    (drawCursor  (agafa-n (get (get f 'patroFigura) 'punts) (- (cadr La) 1)))
+(defun pinta-punts (La f) 
+    ;Multiplicamos los vertices por la matriz de transformación
+    (moveCursor (mult-fila (add1 (agafa-n (get (get f 'patroFigura) 'punts) (- (car La) 1))) (transposta (get f 'matriu))))      
+    (drawCursor (mult-fila (add1 (agafa-n (get (get f 'patroFigura) 'punts) (- (cadr La) 1))) (transposta (get f 'matriu))))
 )
 
+;Añade un 1 al final de la lista para poder multiplicar
+(defun add1 (L)
+    (reverse (cons 1 (reverse L)))
+)
 
 ;Funciones para pintar una lista de puntos desde el centro de la pantalla
 (defun moveCursor (L) 
     (move (toInt (+ 320 (car L))) (toInt (+ 187 (cadr L))))    
 )
 
-(defun drawCursor (L) 
+(defun drawCursor (L)
     (draw (toInt(+ 320 (car L))) (toInt(+ 187 (cadr L))))    
 )
 
@@ -271,7 +306,7 @@
     )
 )
 		
-;Monta una lista con los n-esimos elementos de cadafila de la matriz
+;Monta una lista con los n-esimos elementos de cada fila de la matriz
 (defun fila-n (M n)
     (cond ((null M) nil)
 	    (t(cons (agafa-n (car M) n) (fila-n (cdr M) n)))
@@ -297,7 +332,7 @@
 ;Realiza las operaciones recursivas para obtener la fila de la matriz resultado
 (defun mult-fila (L M)
 	(cond ((null M) nil)
-		(t (cons (opera-fila L (car M)) (mult-fila L (cdr M))))
+		(t (cons (opera-filas L (car M)) (mult-fila L (cdr M))))
     )
 )
 
